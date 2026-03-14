@@ -41,17 +41,41 @@
           <td><%= student.name %></td>
           <td><%= student.email %></td>
           <td><%= student.phone %></td>
-          <td><%= link_to "Xem", student %></td>
+          <td>
+            <%= link_to "Xem", student %>
+            |
+            <%# Xóa khỏi lớp: set classroom_id = nil %>
+            <%= link_to "Xóa khỏi lớp",
+                remove_student_classroom_path(@classroom, student_id: student.id),
+                data: { turbo_method: :delete,
+                        turbo_confirm: "Xóa #{student.name} khỏi lớp #{@classroom.name}?" } %>
+          </td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% end %>
 
+<hr>
+
+<%# Form gán sinh viên chưa có lớp vào lớp này %>
+<h3>Thêm sinh viên vào lớp</h3>
+
+<% if @unassigned_students.empty? %>
+  <p><em>Không có sinh viên nào chưa được xếp lớp.</em></p>
+<% else %>
+  <%= form_with url: assign_student_classroom_path(@classroom), method: :patch do |form| %>
+    <%= form.select :student_id,
+          @unassigned_students.map { |s| [s.name, s.id] },
+          { include_blank: "-- Chọn sinh viên --" } %>
+    <%= form.submit "Thêm vào lớp" %>
+  <% end %>
+<% end %>
+
 <br>
 <%= link_to "✏️ Chỉnh sửa", edit_classroom_path(@classroom) %>
 |
-<%= link_to "🗑️ Xóa", @classroom,
+<%= link_to "🗑️ Xóa lớp", @classroom,
     data: { turbo_method: :delete,
             turbo_confirm: "Xóa lớp #{@classroom.name}? Sinh viên sẽ không bị xóa." } %>
 |

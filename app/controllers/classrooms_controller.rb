@@ -1,5 +1,5 @@
 class ClassroomsController < ApplicationController
-  before_action :set_classroom, only: [:show, :edit, :update, :destroy]
+  before_action :set_classroom, only: [:show, :edit, :update, :destroy, :assign_student, :remove_student]
 
   # GET /classrooms
   def index
@@ -12,6 +12,8 @@ class ClassroomsController < ApplicationController
     # @classroom đã được set bởi before_action
     # Lấy danh sách sinh viên của lớp, sắp xếp theo tên
     @students = @classroom.students.by_name
+    # Lấy sinh viên chưa được xếp lớp — dùng cho form assign
+    @unassigned_students = Student.where(classroom_id: nil).by_name
   end
 
   # GET /classrooms/new
@@ -41,6 +43,26 @@ class ClassroomsController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  # PATCH /classrooms/:id/assign_student
+  # Gán sinh viên (params[:student_id]) vào lớp này
+  def assign_student
+    student = Student.find(params[:student_id])
+    student.update!(classroom: @classroom)
+    redirect_to @classroom, notice: "Đã thêm #{student.name} vào lớp #{@classroom.name}."
+  rescue ActiveRecord::RecordNotFound
+    redirect_to @classroom, alert: "Không tìm thấy sinh viên."
+  end
+
+  # DELETE /classrooms/:id/remove_student
+  # Xóa sinh viên (params[:student_id]) khỏi lớp (set classroom_id = nil)
+  def remove_student
+    student = Student.find(params[:student_id])
+    student.update!(classroom: nil)
+    redirect_to @classroom, notice: "Đã xóa #{student.name} khỏi lớp.", status: :see_other
+  rescue ActiveRecord::RecordNotFound
+    redirect_to @classroom, alert: "Không tìm thấy sinh viên."
   end
 
   # DELETE /classrooms/:id
