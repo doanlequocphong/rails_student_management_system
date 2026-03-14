@@ -17,6 +17,16 @@
       <%= link_to "👥 Sinh viên", students_path %> |
       <%= link_to "🏫 Lớp học", classrooms_path %> |
       <%= link_to "📚 Môn học", courses_path %>
+
+      <%# Phần bên phải: thông tin đăng nhập %>
+      <span style="float:right;">
+        <% if user_signed_in? %>
+          👤 <%= current_user.email %> |
+          <%= link_to "Đăng xuất", destroy_user_session_path, data: { turbo_method: :delete } %>
+        <% else %>
+          <%= link_to "Đăng nhập", new_user_session_path %>
+        <% end %>
+      </span>
     </nav>
 
     <hr>
