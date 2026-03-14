@@ -1,0 +1,100 @@
+<h1>Nhập điểm: <%= @course.code %> — <%= @course.name %></h1>
+
+<%# ── Form thêm điểm mới ─────────────────────────────────────────── %>
+<h2>Thêm điểm mới</h2>
+
+<% if @grade.errors.any? %>
+  <div style="border:1px solid #e74c3c; background:#fdf2f2; padding:10px; margin-bottom:12px; border-radius:4px;">
+    <strong style="color:#e74c3c;">Lỗi:</strong>
+    <%= @grade.errors.full_messages.first %>
+  </div>
+<% end %>
+
+<%= form_with model: [@course, @grade], url: course_grades_path(@course) do |form| %>
+  <%= form.select :student_id,
+        @students.map { |s| [s.name, s.id] },
+        { include_blank: "-- Chọn sinh viên --" } %>
+
+  <%= form.select :grade_type,
+        Grade::GRADE_TYPES.map { |t| [t.capitalize, t] },
+        { include_blank: "-- Loại điểm --" } %>
+
+  <%= form.number_field :score, placeholder: "0-100", in: 0..100, style: "width:70px" %>
+
+  <%= form.text_field :comment, placeholder: "Ghi chú (tùy chọn)", style: "width:200px" %>
+
+  <%= form.submit "Lưu điểm" %>
+<% end %>
+
+<hr>
+
+<%# ── Bảng điểm hiện có ──────────────────────────────────────────── %>
+<h2>Bảng điểm (<%= @students.count %> sinh viên)</h2>
+
+<% if @students.empty? %>
+  <p><em>Chưa có sinh viên nào đăng ký môn này.</em></p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>Họ tên</th>
+        <% Grade::GRADE_TYPES.each do |type| %>
+          <th><%= type.capitalize %></th>
+        <% end %>
+        <th>Trung bình</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @students.each do |student| %>
+        <% student_grades = @grades_by_student[student.id] || [] %>
+        <tr>
+          <td><%= link_to student.name, student %></td>
+
+          <%# Mỗi cột = 1 loại điểm %>
+          <% Grade::GRADE_TYPES.each do |type| %>
+            <% grade = student_grades.find { |g| g.grade_type == type } %>
+            <td>
+              <% if grade %>
+                <%# Hiển thị điểm + form sửa inline %>
+                <%= form_with url: course_grade_path(@course, grade),
+                              method: :patch,
+                              style: "display:inline" do |form| %>
+                  <%= form.number_field :score,
+                        value: grade.score,
+                        in: 0..100,
+                        style: "width:55px" %>
+                  <%= form.submit "✓", style: "font-size:0.8em" %>
+                <% end %>
+                <span style="color:<%= grade.passed? ? 'green' : 'red' %>">
+                  (<%= grade.letter_grade %>)
+                </span>
+                <%= link_to "✕",
+                    course_grade_path(@course, grade),
+                    data: { turbo_method: :delete,
+                            turbo_confirm: "Xóa điểm #{type} của #{student.name}?" },
+                    style: "color:red; font-size:0.8em" %>
+              <% else %>
+                <span style="color:#ccc;">—</span>
+              <% end %>
+            </td>
+          <% end %>
+
+          <%# Cột trung bình %>
+          <td>
+            <% if student_grades.any? %>
+              <% avg = (student_grades.sum(&:score).to_f / student_grades.size).round(1) %>
+              <strong style="color:<%= avg >= 50 ? 'green' : 'red' %>">
+                <%= avg %>
+              </strong>
+            <% else %>
+              <span style="color:#ccc;">—</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<br>
+<%= link_to "⬅️ Quay lại môn học", @course %>

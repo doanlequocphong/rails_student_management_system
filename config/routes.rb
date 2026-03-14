@@ -18,8 +18,10 @@ Rails.application.routes.draw do
     end
   end
 
-  # RESTful routes cho Courses
-  resources :courses
+  # RESTful routes cho Courses + Grades lồng nhau
+  resources :courses do
+    resources :grades, only: [:index, :create, :update, :destroy]
+  end
 
   # Health check endpoint (Rails built-in)
   get "up" => "rails/health#show", as: :rails_health_check
