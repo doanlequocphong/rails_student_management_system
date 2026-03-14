@@ -49,6 +49,29 @@ class Student < ApplicationRecord
   scope :by_name, -> { order(:name) }
   scope :search,  ->(q) { where("name ILIKE :q OR email ILIKE :q", q: "%#{q}%") }
 
+  # ── Transcript Methods ───────────────────────────────────────────
+  # Điểm trung bình tổng tất cả grades (hệ 100)
+  def overall_average
+    all_grades = grades.map(&:score)
+    return nil if all_grades.empty?
+
+    (all_grades.sum.to_f / all_grades.size).round(1)
+  end
+
+  # Tổng tín chỉ đã đăng ký
+  def total_credits
+    courses.sum(:credits)
+  end
+
+  # Tổng tín chỉ đã đạt (TB môn >= 50)
+  def earned_credits
+    courses.joins(:grades)
+           .where(grades: { student_id: id })
+           .group("courses.id, courses.credits")
+           .having("AVG(grades.score) >= ?", Grade::PASSING_SCORE)
+           .sum(:credits)
+  end
+
   private
 
   def age_must_be_reasonable

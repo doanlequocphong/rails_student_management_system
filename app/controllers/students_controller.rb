@@ -1,7 +1,7 @@
 class StudentsController < ApplicationController
   # before_action: chạy trước các action chỉ định
   # Tránh lặp code tìm @student ở show, edit, update, destroy
-  before_action :set_student, only: [:show, :edit, :update, :destroy]
+  before_action :set_student, only: [:show, :edit, :update, :destroy, :transcript]
 
   # GET /students
   # Lấy danh sách tất cả sinh viên
@@ -17,6 +17,20 @@ class StudentsController < ApplicationController
     # Môn học chưa đăng ký — dùng cho dropdown
     enrolled_course_ids = @enrollments.map(&:course_id)
     @available_courses  = Course.by_name.where.not(id: enrolled_course_ids)
+  end
+
+  # GET /students/:id/transcript
+  # Bảng điểm tổng hợp — read-only
+  def transcript
+    # Enrollments + courses (eager load để tránh N+1)
+    @enrollments = @student.enrollments
+                           .includes(:course)
+                           .order("courses.name")
+
+    # Tất cả grades của sinh viên, group theo course để tra cứu nhanh
+    @grades_by_course = @student.grades
+                                .includes(:course)
+                                .group_by(&:course_id)
   end
 
   # GET /students/new
