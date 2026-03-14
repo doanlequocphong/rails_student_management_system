@@ -18,6 +18,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # RESTful routes cho Courses
+  resources :courses
+
   # Health check endpoint (Rails built-in)
   get "up" => "rails/health#show", as: :rails_health_check
 end

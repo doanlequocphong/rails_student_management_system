@@ -1,0 +1,88 @@
+<h1>Chi tiết Môn học</h1>
+
+<dl>
+  <dt>Mã môn:</dt>
+  <dd><strong><%= @course.code %></strong></dd>
+
+  <dt>Tên môn:</dt>
+  <dd><%= @course.name %></dd>
+
+  <dt>Số tín chỉ:</dt>
+  <dd><%= @course.credits || "(chưa có)" %></dd>
+
+  <dt>Mô tả:</dt>
+  <dd><%= @course.description.presence || "(chưa có)" %></dd>
+
+  <dt>Ngày tạo:</dt>
+  <dd><%= @course.created_at.strftime("%d/%m/%Y %H:%M") %></dd>
+</dl>
+
+<hr>
+
+<h2>Sinh viên đã đăng ký (<%= @enrollments.count %>)</h2>
+
+<% if @enrollments.empty? %>
+  <p><em>Chưa có sinh viên nào đăng ký môn này.</em></p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>Ngày đăng ký</th>
+        <th>Điểm</th>
+        <th>Kết quả</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @enrollments.each do |enrollment| %>
+        <tr>
+          <td><%= link_to enrollment.student.name, enrollment.student %></td>
+          <td><%= enrollment.student.email %></td>
+          <td><%= enrollment.enrolled_at&.strftime("%d/%m/%Y") %></td>
+          <td><%= enrollment.grade || "—" %></td>
+          <td>
+            <% if enrollment.grade.nil? %>
+              <em style="color:#999;">Chưa có điểm</em>
+            <% elsif enrollment.grade >= 5 %>
+              <span style="color:green;">Đạt</span>
+            <% else %>
+              <span style="color:red;">Không đạt</span>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to "Trang SV", enrollment.student %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%# Thống kê điểm nhanh %>
+  <% graded = @enrollments.select { |e| e.grade.present? } %>
+  <% if graded.any? %>
+    <p>
+      Điểm trung bình: <strong>
+        <%= (graded.sum(&:grade) / graded.size).round(2) %>
+      </strong>
+      &nbsp;|&nbsp;
+      Đạt: <strong style="color:green;">
+        <%= graded.count { |e| e.grade >= 5 } %>
+      </strong>
+      &nbsp;/&nbsp;
+      Không đạt: <strong style="color:red;">
+        <%= graded.count { |e| e.grade < 5 } %>
+      </strong>
+    </p>
+  <% end %>
+<% end %>
+
+<br>
+<%= link_to "✏️ Chỉnh sửa", edit_course_path(@course) %>
+|
+<%= link_to "🗑️ Xóa", @course,
+    data: { turbo_method: :delete,
+            turbo_confirm: "Xóa môn #{@course.name}? Tất cả đăng ký sẽ bị xóa." } %>
+|
+<%= link_to "⬅️ Quay lại danh sách", courses_path %>

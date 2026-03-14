@@ -1,0 +1,60 @@
+<%# Partial dùng chung cho new và edit %>
+
+<% if course.errors.any? %>
+  <div style="border:1px solid #e74c3c; background:#fdf2f2; padding:12px; margin-bottom:16px; border-radius:4px;">
+    <strong style="color:#e74c3c;">
+      Vui lòng sửa <%= pluralize(course.errors.count, "lỗi") %> sau:
+    </strong>
+    <ul style="margin:8px 0 0 20px;">
+      <% course.errors.each do |error| %>
+        <li style="color:#c0392b;"><%= error.full_message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: course do |form| %>
+
+  <% field_style = ->(field) { course.errors[field].any? ? "border:1px solid red;" : "" } %>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :code, "Mã môn *" %>
+    <%= form.text_field :code, placeholder: "VD: CS101, MATH301",
+          style: field_style.call(:code) %>
+    <% if course.errors[:code].any? %>
+      <span style="color:red; font-size:0.85em;"><%= course.errors[:code].first %></span>
+    <% end %>
+    <small style="color:#666; display:block;">Chỉ chữ hoa và số, 2-10 ký tự</small>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :name, "Tên môn học *" %>
+    <%= form.text_field :name, placeholder: "VD: Toán cao cấp, Lập trình Ruby",
+          style: field_style.call(:name) %>
+    <% if course.errors[:name].any? %>
+      <span style="color:red; font-size:0.85em;"><%= course.errors[:name].first %></span>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :credits, "Số tín chỉ" %>
+    <%= form.number_field :credits, in: 1..10, placeholder: "1-10",
+          style: field_style.call(:credits) %>
+    <% if course.errors[:credits].any? %>
+      <span style="color:red; font-size:0.85em;"><%= course.errors[:credits].first %></span>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :description, "Mô tả" %>
+    <%= form.text_area :description, rows: 3,
+          placeholder: "Mô tả nội dung môn học (không bắt buộc)" %>
+  </div>
+
+  <div>
+    <% submit_label = course.new_record? ? "Tạo môn học" : "Cập nhật môn học" %>
+    <%= form.submit submit_label %>
+    <%= link_to "Hủy", courses_path %>
+  </div>
+
+<% end %>
