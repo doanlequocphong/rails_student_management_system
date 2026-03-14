@@ -50,12 +50,12 @@ class Student < ApplicationRecord
   scope :search,  ->(q) { where("name ILIKE :q OR email ILIKE :q", q: "%#{q}%") }
 
   # ── Transcript Methods ───────────────────────────────────────────
-  # Điểm trung bình tổng tất cả grades (hệ 100)
+  # Điểm trung bình tổng tất cả grades (hệ 100) — simple average
   def overall_average
-    all_grades = grades.map(&:score)
-    return nil if all_grades.empty?
+    all_scores = grades.map(&:score)
+    return nil if all_scores.empty?
 
-    (all_grades.sum.to_f / all_grades.size).round(1)
+    (all_scores.sum.to_f / all_scores.size).round(1)
   end
 
   # Tổng tín chỉ đã đăng ký
@@ -70,6 +70,67 @@ class Student < ApplicationRecord
            .group("courses.id, courses.credits")
            .having("AVG(grades.score) >= ?", Grade::PASSING_SCORE)
            .sum(:credits)
+  end
+
+  # ── GPA Methods ──────────────────────────────────────────────────
+
+  # GPA hệ 100 — trung bình có trọng số (credits là weight)
+  # GPA = Σ(avg_score_môn × credits_môn) / Σ(credits)
+  def gpa
+    enrolled_courses = courses.includes(:grades).to_a
+    return nil if enrolled_courses.empty?
+
+    weighted_sum = 0.0
+    total_weight = 0
+
+    enrolled_courses.each do |course|
+      # Điểm của student này trong môn này
+      course_scores = course.grades
+                            .select { |g| g.student_id == id }
+                            .map(&:score)
+      next if course_scores.empty?
+
+      course_avg = course_scores.sum.to_f / course_scores.size
+      weight     = course.credits || 1   # mặc định 1 nếu chưa có tín chỉ
+
+      weighted_sum += course_avg * weight
+      total_weight += weight
+    end
+
+    return nil if total_weight.zero?
+
+    (weighted_sum / total_weight).round(2)
+  end
+
+  # Quy đổi GPA hệ 100 sang hệ 4.0
+  def gpa_4
+    score = gpa
+    return nil if score.nil?
+
+    case score
+    when 90..100 then 4.0
+    when 80...90 then 3.5
+    when 70...80 then 3.0
+    when 65...70 then 2.5
+    when 60...65 then 2.0
+    when 50...60 then 1.0
+    else              0.0
+    end
+  end
+
+  # Học lực dựa trên GPA hệ 4
+  def academic_standing
+    g4 = gpa_4
+    return "Chưa xác định" if g4.nil?
+
+    case g4
+    when 3.6..4.0 then "Xuất sắc"
+    when 3.2...3.6 then "Giỏi"
+    when 2.5...3.2 then "Khá"
+    when 2.0...2.5 then "Trung bình"
+    when 1.0...2.0 then "Yếu"
+    else                "Kém"
+    end
   end
 
   private

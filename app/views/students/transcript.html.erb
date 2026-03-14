@@ -109,6 +109,10 @@
   <%# ── Tổng kết ─────────────────────────────────────────────────── %>
   <h3>Tổng kết</h3>
 
+  <% gpa    = @student.gpa %>
+  <% gpa_4  = @student.gpa_4 %>
+  <% standing = @student.academic_standing %>
+
   <table cellpadding="6" border="1">
     <tr>
       <td>Số môn đã đăng ký:</td>
@@ -123,11 +127,40 @@
       <td><strong style="color:green"><%= @student.earned_credits %></strong></td>
     </tr>
     <tr>
-      <td>Điểm trung bình tổng:</td>
+      <td>Điểm TB đơn giản:</td>
       <td>
         <% avg = @student.overall_average %>
-        <strong style="color:<%= avg && avg >= Grade::PASSING_SCORE ? 'green' : '#333' %>">
-          <%= avg || "Chưa có điểm" %>
+        <strong><%= avg || "Chưa có điểm" %></strong>
+        <small style="color:#666;">(hệ 100, không trọng số)</small>
+      </td>
+    </tr>
+    <tr style="background:#fffbe6;">
+      <td><strong>GPA (có trọng số):</strong></td>
+      <td>
+        <% if gpa %>
+          <strong style="font-size:1.2em; color:#2c3e50;"><%= gpa %></strong>
+          <small style="color:#666;">/100</small>
+          &nbsp;|&nbsp;
+          <strong style="color:#2980b9;"><%= gpa_4 %></strong>
+          <small style="color:#666;">/4.0</small>
+        <% else %>
+          <em style="color:#999;">Chưa có điểm</em>
+        <% end %>
+      </td>
+    </tr>
+    <tr style="background:#fffbe6;">
+      <td><strong>Học lực:</strong></td>
+      <td>
+        <% color = case standing
+                   when "Xuất sắc" then "#8e44ad"
+                   when "Giỏi"     then "#27ae60"
+                   when "Khá"      then "#2980b9"
+                   when "Trung bình" then "#f39c12"
+                   when "Yếu"      then "#e67e22"
+                   else                 "#e74c3c"
+                   end %>
+        <strong style="color:<%= color %>; font-size:1.1em;">
+          <%= standing %>
         </strong>
       </td>
     </tr>
