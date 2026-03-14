@@ -21,6 +21,10 @@ class Course < ApplicationRecord
                                       message: "phải là số nguyên từ 1 đến 10" },
                       allow_nil: true
 
+  # ── Associations ─────────────────────────────────────────────────
+  # dependent: :destroy — xóa course thì xóa luôn các enrollment liên quan
+  has_many :enrollments, dependent: :destroy
+
   # ── Scopes ────────────────────────────────────────────────────────
   scope :recent,   -> { order(created_at: :desc) }
   scope :by_name,  -> { order(:name) }
