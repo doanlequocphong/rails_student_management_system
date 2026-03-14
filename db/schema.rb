@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_15_090000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_15_091000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,6 +32,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_090000) do
     t.index ["code"], name: "index_courses_on_code", unique: true
   end
 
+  create_table "enrollments", force: :cascade do |t|
+    t.bigint "student_id", null: false
+    t.bigint "course_id", null: false
+    t.date "enrolled_at"
+    t.decimal "grade", precision: 4, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_enrollments_on_course_id"
+    t.index ["student_id", "course_id"], name: "index_enrollments_on_student_id_and_course_id", unique: true
+    t.index ["student_id"], name: "index_enrollments_on_student_id"
+  end
+
   create_table "students", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -44,5 +56,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_090000) do
     t.index ["classroom_id"], name: "index_students_on_classroom_id"
   end
 
+  add_foreign_key "enrollments", "courses"
+  add_foreign_key "enrollments", "students"
   add_foreign_key "students", "classrooms"
 end

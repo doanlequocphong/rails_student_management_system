@@ -3,6 +3,10 @@ class Student < ApplicationRecord
   # optional: true — sinh viên có thể chưa được xếp lớp
   belongs_to :classroom, optional: true
 
+  # Quan hệ với Enrollment (bảng trung gian)
+  # dependent: :destroy — xóa student thì xóa luôn các enrollment
+  has_many :enrollments, dependent: :destroy
+
   # ── Normalization (Rails 7.1) ─────────────────────────────────────
   # Tự động chuẩn hóa dữ liệu TRƯỚC khi validate và lưu DB
   normalizes :email, with: -> (e) { e.strip.downcase }
