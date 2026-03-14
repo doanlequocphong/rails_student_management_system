@@ -4,6 +4,10 @@ Rails.application.routes.draw do
 
   # RESTful routes cho Students + Enrollments lồng nhau (nested)
   resources :students do
+    member do
+      # GET /students/:id/transcript — bảng điểm sinh viên
+      get :transcript
+    end
     # only: giới hạn chỉ 3 actions — không cần index/show/new/edit riêng
     resources :enrollments, only: [:create, :update, :destroy]
   end

@@ -1,0 +1,140 @@
+<h1>Bảng điểm sinh viên</h1>
+
+<%# ── Thông tin sinh viên ────────────────────────────────────────── %>
+<table cellpadding="6">
+  <tr>
+    <td><strong>Họ tên:</strong></td>
+    <td><%= @student.name %></td>
+    <td width="40"></td>
+    <td><strong>Lớp:</strong></td>
+    <td><%= @student.classroom&.name || "(chưa xếp lớp)" %></td>
+  </tr>
+  <tr>
+    <td><strong>Email:</strong></td>
+    <td><%= @student.email %></td>
+    <td></td>
+    <td><strong>Ngày sinh:</strong></td>
+    <td><%= @student.date_of_birth&.strftime("%d/%m/%Y") || "—" %></td>
+  </tr>
+</table>
+
+<hr>
+
+<%# ── Bảng điểm chi tiết ────────────────────────────────────────── %>
+<h2>Kết quả học tập</h2>
+
+<% if @enrollments.empty? %>
+  <p><em>Sinh viên chưa đăng ký môn học nào.</em></p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>Mã môn</th>
+        <th>Tên môn học</th>
+        <th>Tín chỉ</th>
+        <% Grade::GRADE_TYPES.each do |type| %>
+          <th><%= type.capitalize %></th>
+        <% end %>
+        <th>Trung bình</th>
+        <th>Xếp loại</th>
+        <th>Kết quả</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @enrollments.each do |enrollment| %>
+        <% course        = enrollment.course %>
+        <% course_grades = @grades_by_course[course.id] || [] %>
+
+        <%# Tính điểm trung bình của môn này %>
+        <% avg = if course_grades.any?
+                   (course_grades.sum(&:score).to_f / course_grades.size).round(1)
+                 end %>
+        <% passed = avg && avg >= Grade::PASSING_SCORE %>
+
+        <tr style="background:<%= passed ? '#f0fff0' : (avg ? '#fff0f0' : 'white') %>">
+          <td><strong><%= course.code %></strong></td>
+          <td><%= link_to course.name, course %></td>
+          <td style="text-align:center"><%= course.credits || "—" %></td>
+
+          <%# Cột điểm theo từng loại %>
+          <% Grade::GRADE_TYPES.each do |type| %>
+            <% g = course_grades.find { |gr| gr.grade_type == type } %>
+            <td style="text-align:center">
+              <% if g %>
+                <span style="color:<%= g.passed? ? 'green' : 'red' %>">
+                  <%= g.score %>
+                </span>
+              <% else %>
+                <span style="color:#ccc;">—</span>
+              <% end %>
+            </td>
+          <% end %>
+
+          <%# Cột trung bình %>
+          <td style="text-align:center">
+            <% if avg %>
+              <strong style="color:<%= passed ? 'green' : 'red' %>">
+                <%= avg %>
+              </strong>
+            <% else %>
+              <span style="color:#ccc;">Chưa có điểm</span>
+            <% end %>
+          </td>
+
+          <%# Xếp loại chữ %>
+          <td style="text-align:center">
+            <% if avg %>
+              <% dummy_grade = Grade.new(score: avg.to_i) %>
+              <%= dummy_grade.letter_grade %>
+            <% else %>
+              —
+            <% end %>
+          </td>
+
+          <%# Đạt / Không đạt / Chưa rõ %>
+          <td style="text-align:center">
+            <% if avg.nil? %>
+              <em style="color:#999;">Chưa có điểm</em>
+            <% elsif passed %>
+              <span style="color:green; font-weight:bold;">Đạt</span>
+            <% else %>
+              <span style="color:red; font-weight:bold;">Không đạt</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%# ── Tổng kết ─────────────────────────────────────────────────── %>
+  <h3>Tổng kết</h3>
+
+  <table cellpadding="6" border="1">
+    <tr>
+      <td>Số môn đã đăng ký:</td>
+      <td><strong><%= @enrollments.count %></strong></td>
+    </tr>
+    <tr>
+      <td>Tổng tín chỉ đăng ký:</td>
+      <td><strong><%= @student.total_credits %></strong></td>
+    </tr>
+    <tr>
+      <td>Tổng tín chỉ đạt:</td>
+      <td><strong style="color:green"><%= @student.earned_credits %></strong></td>
+    </tr>
+    <tr>
+      <td>Điểm trung bình tổng:</td>
+      <td>
+        <% avg = @student.overall_average %>
+        <strong style="color:<%= avg && avg >= Grade::PASSING_SCORE ? 'green' : '#333' %>">
+          <%= avg || "Chưa có điểm" %>
+        </strong>
+      </td>
+    </tr>
+  </table>
+<% end %>
+
+<br>
+<%= link_to "⬅️ Quay lại trang sinh viên", @student %>
+|
+<%= link_to "👥 Danh sách sinh viên", students_path %>
