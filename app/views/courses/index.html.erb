@@ -1,0 +1,42 @@
+<h1>Danh sách Môn học</h1>
+
+<%= link_to "➕ Thêm môn học mới", new_course_path %>
+
+<% if @courses.empty? %>
+  <p>Chưa có môn học nào.</p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>Mã môn</th>
+        <th>Tên môn học</th>
+        <th>Tín chỉ</th>
+        <th>Số SV đăng ký</th>
+        <th>Mô tả</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @courses.each do |course| %>
+        <tr>
+          <td><strong><%= course.code %></strong></td>
+          <td><%= course.name %></td>
+          <td><%= course.credits || "—" %></td>
+          <td><%= course.enrollments.size %></td>
+          <td><%= truncate(course.description, length: 50) %></td>
+          <td>
+            <%= link_to "Xem", course %>
+            |
+            <%= link_to "Sửa", edit_course_path(course) %>
+            |
+            <%= link_to "Xóa", course,
+                data: { turbo_method: :delete,
+                        turbo_confirm: "Xóa môn #{course.name}? Tất cả đăng ký sẽ bị xóa theo." } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<p>Tổng cộng: <strong><%= @courses.size %></strong> môn học</p>
