@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= content_for?(:title) ? yield(:title) : "Student Management System" %></title>
+
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%# ── AdminLTE CSS via CDN ─────────────────────────────── %>
+  <%# Google Fonts — Nunito %>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+
+  <%# Font Awesome 5 — icons %>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <%# Bootstrap 4 CSS %>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+  <%# AdminLTE 3 CSS %>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+
+  <%# Custom app CSS (nếu có) %>
+  <%= stylesheet_link_tag "application", media: "all" %>
+</head>
+
+<%# body class quan trọng: hold-transition sidebar-mini layout-fixed %>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <%# ── Navbar (top bar) ──────────────────────────────────── %>
+  <%= render "layouts/navbar" %>
+
+  <%# ── Sidebar (left menu) ───────────────────────────────── %>
+  <%= render "layouts/sidebar" %>
+
+  <%# ── Content Wrapper ──────────────────────────────────── %>
+  <div class="content-wrapper">
+
+    <%# Page Header — title + breadcrumb %>
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">
+              <%= content_for?(:page_title) ? yield(:page_title) : "" %>
+            </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item">
+                <%= link_to "Trang chủ", root_path %>
+              </li>
+              <% if content_for?(:breadcrumb) %>
+                <%= yield(:breadcrumb) %>
+              <% end %>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Main Content %>
+    <div class="content">
+      <div class="container-fluid">
+
+        <%# Flash messages %>
+        <% if notice %>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle mr-2"></i>
+            <%= notice %>
+            <button type="button" class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+          </div>
+        <% end %>
+
+        <% if alert %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <%= alert %>
+            <button type="button" class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+          </div>
+        <% end %>
+
+        <%# Nội dung của từng view %>
+        <%= yield %>
+
+      </div>
+    </div>
+  </div>
+
+  <%# ── Footer ─────────────────────────────────────────────── %>
+  <%= render "layouts/footer" %>
+
+</div><%# end .wrapper %>
+
+<%# ── AdminLTE JS via CDN ──────────────────────────────────── %>
+<%# jQuery — cần thiết cho Bootstrap 4 + AdminLTE %>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<%# Bootstrap 4 JS %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<%# AdminLTE 3 JS %>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+
+<%# Turbo + Stimulus (Rails 7) %>
+<%= javascript_importmap_tags %>
+
+</body>
+</html>

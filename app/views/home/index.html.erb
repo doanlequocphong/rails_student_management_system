@@ -1,15 +1,131 @@
-<!-- View nhận biến instance (@bien) từ Controller -->
-<!-- ERB: <% %> = Ruby code, <%= %> = in ra màn hình -->
+<% content_for :page_title, "Dashboard" %>
+<% content_for :breadcrumb do %>
+  <li class="breadcrumb-item active">Dashboard</li>
+<% end %>
 
-<h1><%= @project_name %></h1>
+<%# ── Stats Cards ─────────────────────────────────────────────── %>
+<div class="row">
 
-<p>Chào mừng đến với hệ thống quản lý sinh viên!</p>
+  <%# Sinh viên %>
+  <div class="col-lg-3 col-6">
+    <div class="small-box bg-info">
+      <div class="inner">
+        <h3><%= @students_count %></h3>
+        <p>Sinh viên</p>
+      </div>
+      <div class="icon"><i class="fas fa-user-graduate"></i></div>
+      <%= link_to students_path, class: "small-box-footer" do %>
+        Xem thêm <i class="fas fa-arrow-circle-right"></i>
+      <% end %>
+    </div>
+  </div>
 
-<p>Thời gian hiện tại: <strong><%= @current_time %></strong></p>
+  <%# Lớp học %>
+  <div class="col-lg-3 col-6">
+    <div class="small-box bg-success">
+      <div class="inner">
+        <h3><%= @classrooms_count %></h3>
+        <p>Lớp học</p>
+      </div>
+      <div class="icon"><i class="fas fa-chalkboard"></i></div>
+      <%= link_to classrooms_path, class: "small-box-footer" do %>
+        Xem thêm <i class="fas fa-arrow-circle-right"></i>
+      <% end %>
+    </div>
+  </div>
 
-<h2>Chức năng của hệ thống:</h2>
-<ul>
-  <% @features.each do |feature| %>
-    <li><%= feature %></li>
-  <% end %>
-</ul>
+  <%# Môn học %>
+  <div class="col-lg-3 col-6">
+    <div class="small-box bg-warning">
+      <div class="inner">
+        <h3><%= @courses_count %></h3>
+        <p>Môn học</p>
+      </div>
+      <div class="icon"><i class="fas fa-book"></i></div>
+      <%= link_to courses_path, class: "small-box-footer" do %>
+        Xem thêm <i class="fas fa-arrow-circle-right"></i>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Điểm số %>
+  <div class="col-lg-3 col-6">
+    <div class="small-box bg-danger">
+      <div class="inner">
+        <h3><%= @grades_count %></h3>
+        <p>Điểm đã nhập</p>
+      </div>
+      <div class="icon"><i class="fas fa-star"></i></div>
+      <span class="small-box-footer">&nbsp;</span>
+    </div>
+  </div>
+
+</div>
+
+<%# ── Quick Links Card ──────────────────────────────────────── %>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-primary card-outline">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-th mr-2"></i>Truy cập nhanh</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6 mb-3">
+            <%= link_to new_student_path, class: "btn btn-block btn-outline-info" do %>
+              <i class="fas fa-user-plus mr-1"></i> Thêm sinh viên
+            <% end %>
+          </div>
+          <div class="col-6 mb-3">
+            <%= link_to new_classroom_path, class: "btn btn-block btn-outline-success" do %>
+              <i class="fas fa-plus mr-1"></i> Thêm lớp học
+            <% end %>
+          </div>
+          <div class="col-6 mb-3">
+            <%= link_to new_course_path, class: "btn btn-block btn-outline-warning" do %>
+              <i class="fas fa-plus mr-1"></i> Thêm môn học
+            <% end %>
+          </div>
+          <div class="col-6 mb-3">
+            <%= link_to students_path, class: "btn btn-block btn-outline-secondary" do %>
+              <i class="fas fa-list mr-1"></i> Danh sách SV
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# System Info Card %>
+  <div class="col-md-6">
+    <div class="card card-secondary card-outline">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-info-circle mr-2"></i>Thông tin hệ thống</h3>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-borderless mb-0">
+          <tr>
+            <td class="text-muted pl-3">Hệ thống</td>
+            <td><strong><%= @project_name %></strong></td>
+          </tr>
+          <tr>
+            <td class="text-muted pl-3">Thời gian</td>
+            <td><%= @current_time.strftime("%d/%m/%Y %H:%M") %></td>
+          </tr>
+          <% if user_signed_in? %>
+            <tr>
+              <td class="text-muted pl-3">Người dùng</td>
+              <td><%= current_user.email %></td>
+            </tr>
+            <tr>
+              <td class="text-muted pl-3">Vai trò</td>
+              <td>
+                <span class="badge badge-info"><%= current_user.display_role %></span>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

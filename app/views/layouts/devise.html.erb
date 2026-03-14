@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Management System — Đăng nhập</title>
+
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%# Google Fonts %>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Nunito:400,600,700">
+
+  <%# Font Awesome %>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <%# Bootstrap 4 %>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+  <%# AdminLTE 3 %>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+</head>
+
+<%# AdminLTE login-page: body class phải là "hold-transition login-page" %>
+<body class="hold-transition login-page">
+
+  <%# Flash messages (nằm trên login box) %>
+  <div style="position:fixed; top:20px; left:50%; transform:translateX(-50%);
+              z-index:9999; min-width:320px; text-align:center;">
+    <% if notice %>
+      <div class="alert alert-success alert-dismissible shadow">
+        <i class="fas fa-check-circle mr-2"></i><%= notice %>
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+      </div>
+    <% end %>
+    <% if alert %>
+      <div class="alert alert-danger alert-dismissible shadow">
+        <i class="fas fa-exclamation-circle mr-2"></i><%= alert %>
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Nội dung login/register form được yield vào đây %>
+  <%= yield %>
+
+  <%# JS %>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+  <%= javascript_importmap_tags %>
+
+</body>
+</html>

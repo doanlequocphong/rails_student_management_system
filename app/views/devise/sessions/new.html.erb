@@ -1,26 +1,94 @@
-<h2>Log in</h2>
+<%# AdminLTE Login Page — nằm trong layout devise.html.erb %>
+<%# body.login-page → AdminLTE tự style login-box ở giữa màn hình %>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+<div class="login-box">
+
+  <%# Logo %>
+  <div class="login-logo">
+    <a href="/"><b>Student</b> MS</a>
   </div>
 
-  <div class="field">
-    <p><%= f.label :password %></p>
-    <p><%= f.password_field :password, autocomplete: "current-password" %></p>
-  </div>
-
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <p><%= f.check_box :remember_me %></p>
-      <p><%= f.label :remember_me %></p>
+  <div class="card card-outline card-primary">
+    <div class="card-header text-center">
+      <p class="login-box-msg mb-0">
+        <i class="fas fa-sign-in-alt mr-1"></i>
+        Đăng nhập vào hệ thống
+      </p>
     </div>
-  <% end %>
 
-  <div class="actions">
-    <%= f.submit "Log in" %>
+    <div class="card-body">
+
+      <%# Devise error messages %>
+      <% if resource.errors.any? %>
+        <div class="alert alert-danger">
+          <% resource.errors.full_messages.each do |msg| %>
+            <div><i class="fas fa-times-circle mr-1"></i><%= msg %></div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= form_for(resource, as: resource_name,
+                  url: session_path(resource_name)) do |f| %>
+
+        <%# Email %>
+        <div class="input-group mb-3">
+          <%= f.email_field :email,
+                            autofocus: true,
+                            autocomplete: "email",
+                            placeholder: "Email",
+                            class: "form-control" %>
+          <div class="input-group-append">
+            <div class="input-group-text"><i class="fas fa-envelope"></i></div>
+          </div>
+        </div>
+
+        <%# Password %>
+        <div class="input-group mb-3">
+          <%= f.password_field :password,
+                               autocomplete: "current-password",
+                               placeholder: "Mật khẩu",
+                               class: "form-control" %>
+          <div class="input-group-append">
+            <div class="input-group-text"><i class="fas fa-lock"></i></div>
+          </div>
+        </div>
+
+        <%# Remember me + Submit %>
+        <div class="row">
+          <div class="col-8">
+            <% if devise_mapping.rememberable? %>
+              <div class="icheck-primary">
+                <%= f.check_box :remember_me, id: "remember_me" %>
+                <%= f.label :remember_me, "Ghi nhớ đăng nhập",
+                            for: "remember_me", class: "form-check-label ml-1" %>
+              </div>
+            <% end %>
+          </div>
+          <div class="col-4">
+            <%= f.submit "Đăng nhập",
+                         class: "btn btn-primary btn-block" %>
+          </div>
+        </div>
+
+      <% end %>
+
+      <%# Links — forgot password, sign up %>
+      <div class="mt-3 text-center">
+        <% if devise_mapping.recoverable? &&
+               controller_name != "passwords" &&
+               controller_name != "registrations" %>
+          <%= link_to "Quên mật khẩu?", new_password_path(resource_name),
+                      class: "text-muted small" %>
+          <br>
+        <% end %>
+
+        <% if devise_mapping.registerable? &&
+               controller_name != "registrations" %>
+          <%= link_to "Tạo tài khoản mới", new_registration_path(resource_name),
+                      class: "text-center small" %>
+        <% end %>
+      </div>
+
+    </div>
   </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
