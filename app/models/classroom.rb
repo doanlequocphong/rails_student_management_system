@@ -1,4 +1,8 @@
 class Classroom < ApplicationRecord
+  # ── Associations ──────────────────────────────────────────────────
+  # dependent: :nullify — khi xóa lớp, sinh viên vẫn tồn tại (classroom_id = nil)
+  has_many :students, dependent: :nullify
+
   # ── Normalization ─────────────────────────────────────────────────
   normalizes :name,          with: -> (n) { n.strip }
   normalizes :academic_year, with: -> (y) { y.strip }
@@ -15,9 +19,11 @@ class Classroom < ApplicationRecord
   validate :academic_year_range_valid, if: :academic_year?
 
   # ── Scopes ────────────────────────────────────────────────────────
-  scope :recent,      -> { order(created_at: :desc) }
-  scope :by_name,     -> { order(:name) }
-  scope :by_year,     ->(year) { where(academic_year: year) }
+  scope :recent,         -> { order(created_at: :desc) }
+  scope :by_name,        -> { order(:name) }
+  scope :by_year,        ->(year) { where(academic_year: year) }
+  # with_students_count: JOIN để đếm sinh viên trong 1 query (tránh N+1)
+  scope :with_students_count, -> { left_joins(:students).group(:id).select("classrooms.*, COUNT(students.id) AS students_count") }
 
   private
 
