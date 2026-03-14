@@ -14,6 +14,8 @@ class Grade < ApplicationRecord
   normalizes :grade_type, with: -> (t) { t.strip.downcase }
 
   # ── Validations ───────────────────────────────────────────────────
+
+  # Tầng 1 — Format: score phải là integer 0-100
   validates :score, presence: true,
                     numericality: { only_integer: true,
                                     greater_than_or_equal_to: 0,
@@ -24,6 +26,17 @@ class Grade < ApplicationRecord
             inclusion: { in: GRADE_TYPES,
                          message: "phải là: #{GRADE_TYPES.join(', ')}" },
             allow_nil: true
+
+  # Tầng 2 — Uniqueness: 1 SV chỉ có 1 điểm/loại/môn
+  # scope: [:student_id, :course_id] → "grade_type unique trong (student + course)"
+  validates :grade_type,
+            uniqueness: { scope: [:student_id, :course_id],
+                          message: "sinh viên này đã có điểm loại này cho môn học đó" },
+            allow_nil: true
+
+  # Tầng 3 — Business Rule (custom validate):
+  # SV phải đăng ký môn học trước khi được nhập điểm
+  validate :student_must_be_enrolled
 
   # ── Scopes ────────────────────────────────────────────────────────
   scope :recent,       -> { order(created_at: :desc) }
@@ -57,5 +70,17 @@ class Grade < ApplicationRecord
       "assignment" => "Bài tập",
       "quiz"       => "Kiểm tra"
     }[grade_type] || grade_type
+  end
+
+  private
+
+  # Tầng 3: Kiểm tra SV có đăng ký môn này chưa
+  # Nếu chưa → không được nhập điểm
+  def student_must_be_enrolled
+    return unless student && course
+
+    unless Enrollment.exists?(student: student, course: course)
+      errors.add(:student, "chưa đăng ký môn #{course.name} — không thể nhập điểm")
+    end
   end
 end
