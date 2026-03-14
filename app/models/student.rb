@@ -11,6 +11,9 @@ class Student < ApplicationRecord
   # student.courses → danh sách môn học (1 JOIN query, không N+1)
   has_many :courses, through: :enrollments
 
+  # Điểm số hệ 100 — Grade model riêng biệt
+  has_many :grades, dependent: :destroy
+
   # ── Normalization (Rails 7.1) ─────────────────────────────────────
   # Tự động chuẩn hóa dữ liệu TRƯỚC khi validate và lưu DB
   normalizes :email, with: -> (e) { e.strip.downcase }

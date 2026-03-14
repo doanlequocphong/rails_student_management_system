@@ -29,6 +29,9 @@ class Course < ApplicationRecord
   # course.students → danh sách sinh viên (1 JOIN query, không N+1)
   has_many :students, through: :enrollments
 
+  # Điểm số hệ 100 — Grade model riêng biệt
+  has_many :grades, dependent: :destroy
+
   # ── Scopes ────────────────────────────────────────────────────────
   scope :recent,   -> { order(created_at: :desc) }
   scope :by_name,  -> { order(:name) }
