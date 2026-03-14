@@ -18,10 +18,11 @@
       <%= link_to "🏫 Lớp học", classrooms_path %> |
       <%= link_to "📚 Môn học", courses_path %>
 
-      <%# Phần bên phải: thông tin đăng nhập %>
+      <%# Phần bên phải: thông tin đăng nhập + role %>
       <span style="float:right;">
         <% if user_signed_in? %>
-          👤 <%= current_user.email %> |
+          👤 <%= current_user.email %>
+          <small style="color:#666;">[<%= current_user.display_role %>]</small> |
           <%= link_to "Đăng xuất", destroy_user_session_path, data: { turbo_method: :delete } %>
         <% else %>
           <%= link_to "Đăng nhập", new_user_session_path %>
