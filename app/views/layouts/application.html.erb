@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>App</title>
+    <title>Student Management System</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -11,6 +11,23 @@
   </head>
 
   <body>
+    <%# Navbar chung cho toàn app %>
+    <nav>
+      <%= link_to "🏠 Trang chủ", root_path %> |
+      <%= link_to "👥 Sinh viên", students_path %>
+    </nav>
+
+    <hr>
+
+    <%# Flash messages — tự mất sau 1 request %>
+    <% if notice %>
+      <p style="color: green;"><strong><%= notice %></strong></p>
+    <% end %>
+    <% if alert %>
+      <p style="color: red;"><strong><%= alert %></strong></p>
+    <% end %>
+
+    <%# Nội dung của từng view được nhúng vào đây %>
     <%= yield %>
   </body>
 </html>
