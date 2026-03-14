@@ -1,0 +1,90 @@
+<%# ── AdminLTE Left Sidebar ──────────────────────────────────── %>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+
+  <%# Logo + App Name %>
+  <a href="/" class="brand-link">
+    <span class="brand-image img-circle elevation-3"
+          style="background:#007bff; display:inline-flex; align-items:center;
+                 justify-content:center; width:33px; height:33px; font-size:16px;">
+      🎓
+    </span>
+    <span class="brand-text font-weight-light">Student MS</span>
+  </a>
+
+  <div class="sidebar">
+
+    <%# User Panel %>
+    <% if user_signed_in? %>
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <i class="fas fa-user-circle fa-2x text-white ml-1 mt-1"></i>
+        </div>
+        <div class="info">
+          <span class="d-block text-white" style="font-size:0.85em;">
+            <%= current_user.email.split("@").first %>
+          </span>
+          <span class="badge badge-info"><%= current_user.display_role %></span>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Navigation Menu %>
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column"
+          data-widget="treeview" role="menu" data-accordion="false">
+
+        <%# Trang chủ %>
+        <li class="nav-item">
+          <%= link_to root_path,
+                      class: "nav-link #{current_page?(root_path) ? 'active' : ''}" do %>
+            <i class="nav-icon fas fa-home"></i>
+            <p>Trang chủ</p>
+          <% end %>
+        </li>
+
+        <%# Sinh viên %>
+        <li class="nav-item">
+          <%= link_to students_path,
+                      class: "nav-link #{controller_name == 'students' ? 'active' : ''}" do %>
+            <i class="nav-icon fas fa-user-graduate"></i>
+            <p>Sinh viên</p>
+          <% end %>
+        </li>
+
+        <%# Lớp học %>
+        <li class="nav-item">
+          <%= link_to classrooms_path,
+                      class: "nav-link #{controller_name == 'classrooms' ? 'active' : ''}" do %>
+            <i class="nav-icon fas fa-chalkboard"></i>
+            <p>Lớp học</p>
+          <% end %>
+        </li>
+
+        <%# Môn học %>
+        <li class="nav-item">
+          <%= link_to courses_path,
+                      class: "nav-link #{controller_name == 'courses' ? 'active' : ''}" do %>
+            <i class="nav-icon fas fa-book"></i>
+            <p>Môn học</p>
+          <% end %>
+        </li>
+
+        <%# Phân cách %>
+        <li class="nav-header">HỆ THỐNG</li>
+
+        <%# Đăng xuất %>
+        <% if user_signed_in? %>
+          <li class="nav-item">
+            <%= link_to destroy_user_session_path,
+                        data: { turbo_method: :delete },
+                        class: "nav-link" do %>
+              <i class="nav-icon fas fa-sign-out-alt"></i>
+              <p>Đăng xuất</p>
+            <% end %>
+          </li>
+        <% end %>
+
+      </ul>
+    </nav>
+  </div>
+</aside>
