@@ -1,0 +1,56 @@
+services:
+  # ============================================================
+  # Service 1: Rails application
+  # ============================================================
+  rails:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: rails server -b 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/student_management_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # ============================================================
+  # Service 2: PostgreSQL database
+  # ============================================================
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: student_management_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # Service 3: Redis (dùng cho cache, session, background jobs)
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+# Volumes: lưu dữ liệu bền vững khi container restart
+volumes:
+  postgres_data:
+  redis_data:
