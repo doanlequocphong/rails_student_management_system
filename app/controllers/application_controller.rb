@@ -1,4 +1,7 @@
 class ApplicationController < ActionController::Base
+  # Yêu cầu đăng nhập trước khi truy cập bất kỳ action nào
+  before_action :authenticate_user!
+
   # Xử lý khi tìm không thấy record (Student.find(id) không tồn tại)
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
