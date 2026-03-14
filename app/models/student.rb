@@ -7,6 +7,10 @@ class Student < ApplicationRecord
   # dependent: :destroy — xóa student thì xóa luôn các enrollment
   has_many :enrollments, dependent: :destroy
 
+  # has_many :through — truy cập Course qua Enrollment
+  # student.courses → danh sách môn học (1 JOIN query, không N+1)
+  has_many :courses, through: :enrollments
+
   # ── Normalization (Rails 7.1) ─────────────────────────────────────
   # Tự động chuẩn hóa dữ liệu TRƯỚC khi validate và lưu DB
   normalizes :email, with: -> (e) { e.strip.downcase }

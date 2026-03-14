@@ -25,6 +25,10 @@ class Course < ApplicationRecord
   # dependent: :destroy — xóa course thì xóa luôn các enrollment liên quan
   has_many :enrollments, dependent: :destroy
 
+  # has_many :through — truy cập Student qua Enrollment
+  # course.students → danh sách sinh viên (1 JOIN query, không N+1)
+  has_many :students, through: :enrollments
+
   # ── Scopes ────────────────────────────────────────────────────────
   scope :recent,   -> { order(created_at: :desc) }
   scope :by_name,  -> { order(:name) }
