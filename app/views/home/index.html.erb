@@ -1,0 +1,15 @@
+<!-- View nhận biến instance (@bien) từ Controller -->
+<!-- ERB: <% %> = Ruby code, <%= %> = in ra màn hình -->
+
+<h1><%= @project_name %></h1>
+
+<p>Chào mừng đến với hệ thống quản lý sinh viên!</p>
+
+<p>Thời gian hiện tại: <strong><%= @current_time %></strong></p>
+
+<h2>Chức năng của hệ thống:</h2>
+<ul>
+  <% @features.each do |feature| %>
+    <li><%= feature %></li>
+  <% end %>
+</ul>
