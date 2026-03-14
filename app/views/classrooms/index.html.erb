@@ -1,0 +1,43 @@
+<h1>Danh sách Lớp học</h1>
+
+<%= link_to "➕ Thêm lớp mới", new_classroom_path %>
+
+<% if @classrooms.empty? %>
+  <p>Chưa có lớp học nào.</p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tên lớp</th>
+        <th>Năm học</th>
+        <th>Số sinh viên</th>
+        <th>Mô tả</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @classrooms.each do |classroom| %>
+        <tr>
+          <td><%= classroom.id %></td>
+          <td><%= classroom.name %></td>
+          <td><%= classroom.academic_year %></td>
+          <%# students_count được tính sẵn bởi scope with_students_count — không tốn query thêm %>
+          <td><%= classroom.students_count %></td>
+          <td><%= classroom.description %></td>
+          <td>
+            <%= link_to "Xem", classroom %>
+            |
+            <%= link_to "Sửa", edit_classroom_path(classroom) %>
+            |
+            <%= link_to "Xóa", classroom,
+                data: { turbo_method: :delete,
+                        turbo_confirm: "Xóa lớp #{classroom.name}? Sinh viên sẽ không bị xóa." } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<p>Tổng cộng: <strong><%= @classrooms.size %></strong> lớp học</p>

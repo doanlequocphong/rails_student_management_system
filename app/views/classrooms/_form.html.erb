@@ -1,0 +1,47 @@
+<%# Partial dùng chung cho new và edit %>
+
+<% if classroom.errors.any? %>
+  <div style="border:1px solid #e74c3c; background:#fdf2f2; padding:12px; margin-bottom:16px; border-radius:4px;">
+    <strong style="color:#e74c3c;">
+      Vui lòng sửa <%= pluralize(classroom.errors.count, "lỗi") %> sau:
+    </strong>
+    <ul style="margin:8px 0 0 20px;">
+      <% classroom.errors.each do |error| %>
+        <li style="color:#c0392b;"><%= error.full_message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: classroom do |form| %>
+
+  <% field_style = ->(field) { classroom.errors[field].any? ? "border:1px solid red;" : "" } %>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :name, "Tên lớp *" %>
+    <%= form.text_field :name, placeholder: "VD: 12A1, CNTT-K2024", style: field_style.call(:name) %>
+    <% if classroom.errors[:name].any? %>
+      <span style="color:red; font-size:0.85em;"><%= classroom.errors[:name].first %></span>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :academic_year, "Năm học" %>
+    <%= form.text_field :academic_year, placeholder: "2024-2025", style: field_style.call(:academic_year) %>
+    <% if classroom.errors[:academic_year].any? %>
+      <span style="color:red; font-size:0.85em;"><%= classroom.errors[:academic_year].first %></span>
+    <% end %>
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <%= form.label :description, "Mô tả" %>
+    <%= form.text_area :description, rows: 3, placeholder: "Mô tả về lớp học (không bắt buộc)" %>
+  </div>
+
+  <div>
+    <% submit_label = classroom.new_record? ? "Tạo lớp học" : "Cập nhật lớp học" %>
+    <%= form.submit submit_label %>
+    <%= link_to "Hủy", classrooms_path %>
+  </div>
+
+<% end %>
