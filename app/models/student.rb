@@ -1,4 +1,11 @@
 class Student < ApplicationRecord
+  # ── Normalization (Rails 7.1) ─────────────────────────────────────
+  # Tự động chuẩn hóa dữ liệu TRƯỚC khi validate và lưu DB
+  normalizes :email, with: -> (e) { e.strip.downcase }
+  normalizes :name,  with: -> (n) { n.strip.squeeze(" ") }
+  normalizes :phone, with: -> (p) { p.strip }
+  normalizes :address, with: -> (a) { a.strip }
+
   # ── Validations ──────────────────────────────────────────────────
   validates :name,  presence: true,
                     length: { minimum: 2, maximum: 100 }
@@ -12,12 +19,29 @@ class Student < ApplicationRecord
                                message: "chỉ được chứa số và ký tự +, -, dấu cách" },
                     allow_blank: true
 
-  validates :date_of_birth, comparison: { less_than: Date.today,
-                                           message: "phải là ngày trong quá khứ" },
-                             allow_nil: true
+  # FIX: dùng lambda -> { Date.today } để evaluate lại mỗi lần validate
+  # (tránh cache ngày khi server chạy lâu dài)
+  validates :date_of_birth,
+            comparison: { less_than: -> { Date.today },
+                          message: "phải là ngày trong quá khứ" },
+            allow_nil: true
+
+  # ── Custom Validations ────────────────────────────────────────────
+  validate :age_must_be_reasonable, if: :date_of_birth?
 
   # ── Scopes ───────────────────────────────────────────────────────
-  # Truy vấn được đặt tên, tái sử dụng dễ dàng
-  scope :recent, -> { order(created_at: :desc) }
+  scope :recent,  -> { order(created_at: :desc) }
   scope :by_name, -> { order(:name) }
+  scope :search,  ->(q) { where("name ILIKE :q OR email ILIKE :q", q: "%#{q}%") }
+
+  private
+
+  def age_must_be_reasonable
+    age = ((Date.today - date_of_birth) / 365.25).floor
+    if age < 16
+      errors.add(:date_of_birth, "sinh viên phải đủ 16 tuổi (hiện tại #{age} tuổi)")
+    elsif age > 100
+      errors.add(:date_of_birth, "tuổi không hợp lệ (#{age} tuổi)")
+    end
+  end
 end

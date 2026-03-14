@@ -1,48 +1,63 @@
 <%# Partial dùng chung cho new và edit %>
-<%# Biến "student" được truyền từ new.html.erb và edit.html.erb %>
 
-<%# Hiển thị lỗi validation nếu có %>
+<%# Hiển thị tổng hợp lỗi nếu có %>
 <% if student.errors.any? %>
-  <div style="border: 1px solid red; padding: 10px; margin-bottom: 10px;">
-    <h4><%= pluralize(student.errors.count, "lỗi") %> cần sửa:</h4>
-    <ul>
+  <div style="border:1px solid #e74c3c; background:#fdf2f2; padding:12px; margin-bottom:16px; border-radius:4px;">
+    <strong style="color:#e74c3c;">
+      Vui lòng sửa <%= pluralize(student.errors.count, "lỗi") %> sau:
+    </strong>
+    <ul style="margin:8px 0 0 20px;">
       <% student.errors.each do |error| %>
-        <li><%= error.full_message %></li>
+        <li style="color:#c0392b;"><%= error.full_message %></li>
       <% end %>
     </ul>
   </div>
 <% end %>
 
-<%# form_with tự biết POST (new) hay PATCH (edit) dựa vào model %>
 <%= form_with model: student do |form| %>
 
-  <div>
+  <% field_style = ->(field) { student.errors[field].any? ? "border:1px solid red;" : "" } %>
+
+  <div style="margin-bottom:12px;">
     <%= form.label :name, "Họ tên *" %>
-    <%= form.text_field :name, placeholder: "Nguyễn Văn A" %>
+    <%= form.text_field :name, placeholder: "Nguyễn Văn A", style: field_style.call(:name) %>
+    <% if student.errors[:name].any? %>
+      <span style="color:red; font-size:0.85em;"><%= student.errors[:name].first %></span>
+    <% end %>
   </div>
 
-  <div>
+  <div style="margin-bottom:12px;">
     <%= form.label :email, "Email *" %>
-    <%= form.email_field :email, placeholder: "example@email.com" %>
+    <%= form.email_field :email, placeholder: "example@email.com", style: field_style.call(:email) %>
+    <% if student.errors[:email].any? %>
+      <span style="color:red; font-size:0.85em;"><%= student.errors[:email].first %></span>
+    <% end %>
   </div>
 
-  <div>
+  <div style="margin-bottom:12px;">
     <%= form.label :phone, "Điện thoại" %>
-    <%= form.telephone_field :phone, placeholder: "0901234567" %>
+    <%= form.telephone_field :phone, placeholder: "0901234567", style: field_style.call(:phone) %>
+    <% if student.errors[:phone].any? %>
+      <span style="color:red; font-size:0.85em;"><%= student.errors[:phone].first %></span>
+    <% end %>
   </div>
 
-  <div>
+  <div style="margin-bottom:12px;">
     <%= form.label :date_of_birth, "Ngày sinh" %>
-    <%= form.date_field :date_of_birth %>
+    <%= form.date_field :date_of_birth, style: field_style.call(:date_of_birth) %>
+    <% if student.errors[:date_of_birth].any? %>
+      <span style="color:red; font-size:0.85em;"><%= student.errors[:date_of_birth].first %></span>
+    <% end %>
   </div>
 
-  <div>
+  <div style="margin-bottom:12px;">
     <%= form.label :address, "Địa chỉ" %>
     <%= form.text_area :address, rows: 3, placeholder: "Số nhà, đường, quận, thành phố" %>
   </div>
 
   <div>
-    <%= form.submit student.new_record? ? "Tạo sinh viên" : "Cập nhật sinh viên" %>
+    <% submit_label = student.new_record? ? "Tạo sinh viên" : "Cập nhật sinh viên" %>
+    <%= form.submit submit_label %>
     <%= link_to "Hủy", students_path %>
   </div>
 
