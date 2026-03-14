@@ -28,6 +28,23 @@ Rails.application.routes.draw do
     resources :grades, only: [:index, :create, :update, :destroy]
   end
 
+  # ── API v1 ────────────────────────────────────────────────────────
+  # Tất cả API routes nằm dưới /api/v1/...
+  # format: false → không cần .json trong URL (header Accept quyết định)
+  namespace :api do
+    namespace :v1 do
+      resources :students, only: [:index, :show] do
+        member do
+          get :transcript
+        end
+      end
+      resources :courses, only: [:index, :show] do
+        resources :grades, only: [:index]
+      end
+      resources :classrooms, only: [:index, :show]
+    end
+  end
+
   # Health check endpoint (Rails built-in)
   get "up" => "rails/health#show", as: :rails_health_check
 end
