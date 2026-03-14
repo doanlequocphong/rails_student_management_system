@@ -6,7 +6,7 @@ class StudentsController < ApplicationController
   # GET /students
   # Lấy danh sách tất cả sinh viên
   def index
-    @students = Student.all.order(created_at: :desc)
+    @students = Student.recent
   end
 
   # GET /students/:id
