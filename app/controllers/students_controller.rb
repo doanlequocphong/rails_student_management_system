@@ -12,6 +12,11 @@ class StudentsController < ApplicationController
   # GET /students/:id
   # Xem chi tiết 1 sinh viên (set bởi before_action)
   def show
+    # Danh sách môn đang học (kèm enrollment để đọc grade)
+    @enrollments = @student.enrollments.includes(:course).order("courses.name")
+    # Môn học chưa đăng ký — dùng cho dropdown
+    enrolled_course_ids = @enrollments.map(&:course_id)
+    @available_courses  = Course.by_name.where.not(id: enrolled_course_ids)
   end
 
   # GET /students/new

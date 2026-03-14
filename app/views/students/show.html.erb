@@ -32,6 +32,73 @@
   <dd><%= @student.created_at.strftime("%d/%m/%Y %H:%M") %></dd>
 </dl>
 
+<hr>
+
+<%# ── Phần Môn học đăng ký ─────────────────────────────────────── %>
+<h2>Môn học đã đăng ký (<%= @enrollments.count %>)</h2>
+
+<% if @enrollments.empty? %>
+  <p><em>Chưa đăng ký môn học nào.</em></p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>Mã môn</th>
+        <th>Tên môn</th>
+        <th>Ngày đăng ký</th>
+        <th>Điểm</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @enrollments.each do |enrollment| %>
+        <tr>
+          <td><%= enrollment.course.code %></td>
+          <td><%= enrollment.course.name %></td>
+          <td><%= enrollment.enrolled_at&.strftime("%d/%m/%Y") %></td>
+          <td>
+            <%# Form cập nhật điểm inline %>
+            <%= form_with url: student_enrollment_path(@student, enrollment),
+                          method: :patch,
+                          style: "display:inline" do |form| %>
+              <%= form.number_field :grade,
+                    value: enrollment.grade,
+                    in: 0..10,
+                    step: 0.1,
+                    placeholder: "—",
+                    style: "width:60px" %>
+              <%= form.submit "Lưu", style: "font-size:0.8em" %>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to "Hủy đăng ký",
+                student_enrollment_path(@student, enrollment),
+                data: { turbo_method: :delete,
+                        turbo_confirm: "Hủy đăng ký môn #{enrollment.course.name}?" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<hr>
+
+<%# ── Form đăng ký môn mới ────────────────────────────────────────── %>
+<h3>Đăng ký môn học mới</h3>
+
+<% if @available_courses.empty? %>
+  <p><em>Đã đăng ký tất cả môn học hoặc chưa có môn học nào.</em></p>
+<% else %>
+  <%= form_with url: student_enrollments_path(@student), method: :post do |form| %>
+    <%= form.select :course_id,
+          @available_courses.map { |c| ["#{c.code} — #{c.name}", c.id] },
+          { include_blank: "-- Chọn môn học --" } %>
+    <%= form.submit "Đăng ký" %>
+  <% end %>
+<% end %>
+
+<br>
 <%= link_to "✏️ Chỉnh sửa", edit_student_path(@student) %>
 |
 <%= link_to "🗑️ Xóa", @student,
