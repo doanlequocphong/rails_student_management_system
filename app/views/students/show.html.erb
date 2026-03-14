@@ -16,6 +16,15 @@
   <dt>Ngày sinh:</dt>
   <dd><%= @student.date_of_birth&.strftime("%d/%m/%Y") || "(chưa có)" %></dd>
 
+  <dt>Lớp học:</dt>
+  <dd>
+    <% if @student.classroom %>
+      <%= link_to @student.classroom.name, @student.classroom %>
+    <% else %>
+      <em>(chưa xếp lớp)</em>
+    <% end %>
+  </dd>
+
   <dt>Địa chỉ:</dt>
   <dd><%= @student.address.presence || "(chưa có)" %></dd>
 

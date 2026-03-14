@@ -63,6 +63,6 @@ class StudentsController < ApplicationController
 
   # Strong Parameters — chỉ cho phép đúng fields, chống Mass Assignment Attack
   def student_params
-    params.require(:student).permit(:name, :email, :phone, :date_of_birth, :address)
+    params.require(:student).permit(:name, :email, :phone, :date_of_birth, :address, :classroom_id)
   end
 end

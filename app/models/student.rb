@@ -1,4 +1,8 @@
 class Student < ApplicationRecord
+  # ── Associations ──────────────────────────────────────────────────
+  # optional: true — sinh viên có thể chưa được xếp lớp
+  belongs_to :classroom, optional: true
+
   # ── Normalization (Rails 7.1) ─────────────────────────────────────
   # Tự động chuẩn hóa dữ liệu TRƯỚC khi validate và lưu DB
   normalizes :email, with: -> (e) { e.strip.downcase }
