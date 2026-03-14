@@ -1,0 +1,58 @@
+<h1>Chi tiết Lớp học</h1>
+
+<dl>
+  <dt>ID:</dt>
+  <dd><%= @classroom.id %></dd>
+
+  <dt>Tên lớp:</dt>
+  <dd><%= @classroom.name %></dd>
+
+  <dt>Năm học:</dt>
+  <dd><%= @classroom.academic_year.presence || "(chưa có)" %></dd>
+
+  <dt>Mô tả:</dt>
+  <dd><%= @classroom.description.presence || "(chưa có)" %></dd>
+
+  <dt>Ngày tạo:</dt>
+  <dd><%= @classroom.created_at.strftime("%d/%m/%Y %H:%M") %></dd>
+</dl>
+
+<hr>
+
+<h2>Sinh viên trong lớp (<%= @students.count %>)</h2>
+
+<% if @students.empty? %>
+  <p><em>Lớp này chưa có sinh viên nào.</em></p>
+<% else %>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>Điện thoại</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @students.each do |student| %>
+        <tr>
+          <td><%= student.id %></td>
+          <td><%= student.name %></td>
+          <td><%= student.email %></td>
+          <td><%= student.phone %></td>
+          <td><%= link_to "Xem", student %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<br>
+<%= link_to "✏️ Chỉnh sửa", edit_classroom_path(@classroom) %>
+|
+<%= link_to "🗑️ Xóa", @classroom,
+    data: { turbo_method: :delete,
+            turbo_confirm: "Xóa lớp #{@classroom.name}? Sinh viên sẽ không bị xóa." } %>
+|
+<%= link_to "⬅️ Quay lại danh sách", classrooms_path %>
