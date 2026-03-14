@@ -50,6 +50,17 @@ services:
     volumes:
       - redis_data:/data
 
+  # ============================================================
+  # Adminer - Web UI để xem PostgreSQL
+  # ============================================================
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
 # Volumes: lưu dữ liệu bền vững khi container restart
 volumes:
   postgres_data:
