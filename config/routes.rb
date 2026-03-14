@@ -2,8 +2,11 @@ Rails.application.routes.draw do
   # Trang chủ "/" → HomeController#index
   root "home#index"
 
-  # RESTful routes cho Students (7 routes cùng lúc)
-  resources :students
+  # RESTful routes cho Students + Enrollments lồng nhau (nested)
+  resources :students do
+    # only: giới hạn chỉ 3 actions — không cần index/show/new/edit riêng
+    resources :enrollments, only: [:create, :update, :destroy]
+  end
 
   # RESTful routes cho Classrooms + custom member actions
   resources :classrooms do
