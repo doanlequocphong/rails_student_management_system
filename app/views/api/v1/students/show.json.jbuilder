@@ -1,0 +1,9 @@
+json.id              @student.id
+json.name            @student.name
+json.email           @student.email
+json.phone           @student.phone
+json.date_of_birth   @student.date_of_birth
+json.address         @student.address
+json.classroom       @student.classroom&.name
+json.overall_average @student.overall_average
+json.total_credits   @student.total_credits
