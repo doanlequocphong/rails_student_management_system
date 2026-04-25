@@ -76,4 +76,10 @@ Rails.application.configure do
 
   # Devise yêu cầu default_url_options để tạo link trong email
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+  config.after_initialize do
+    Bullet.enable        = true
+    Bullet.rails_logger  = true
+    Bullet.add_footer    = true
+  end
 end

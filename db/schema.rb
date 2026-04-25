@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_15_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_24_190327) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,6 +20,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_120000) do
     t.string "academic_year"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_classrooms_on_name"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -53,6 +54,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_grades_on_course_id"
+    t.index ["student_id", "course_id", "grade_type"], name: "index_grades_unique_per_type", unique: true
     t.index ["student_id", "course_id"], name: "index_grades_on_student_id_and_course_id"
     t.index ["student_id"], name: "index_grades_on_student_id"
   end
@@ -67,6 +69,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_15_120000) do
     t.datetime "updated_at", null: false
     t.bigint "classroom_id"
     t.index ["classroom_id"], name: "index_students_on_classroom_id"
+    t.index ["email"], name: "index_students_on_email", unique: true
+    t.index ["name"], name: "index_students_on_name"
   end
 
   create_table "users", force: :cascade do |t|
