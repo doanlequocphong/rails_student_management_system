@@ -4,17 +4,17 @@
 <table cellpadding="6">
   <tr>
     <td><strong>Họ tên:</strong></td>
-    <td><%= @student.name %></td>
+    <td><%= @presenter.student.name %></td>
     <td width="40"></td>
     <td><strong>Lớp:</strong></td>
-    <td><%= @student.classroom&.name || "(chưa xếp lớp)" %></td>
+    <td><%= @presenter.student.classroom&.name || "(chưa xếp lớp)" %></td>
   </tr>
   <tr>
     <td><strong>Email:</strong></td>
-    <td><%= @student.email %></td>
+    <td><%= @presenter.student.email %></td>
     <td></td>
     <td><strong>Ngày sinh:</strong></td>
-    <td><%= @student.date_of_birth&.strftime("%d/%m/%Y") || "—" %></td>
+    <td><%= @presenter.student.date_of_birth&.strftime("%d/%m/%Y") || "—" %></td>
   </tr>
 </table>
 
@@ -23,8 +23,8 @@
 <%# ── Bảng điểm chi tiết ────────────────────────────────────────── %>
 <h2>Kết quả học tập</h2>
 
-<% if @enrollments.empty? %>
-  <p><em>Sinh viên chưa đăng ký môn học nào.</em></p>
+<% if @presenter.course_rows.empty? %>
+  <p><em>Sinh viên chưa có điểm môn học nào.</em></p>
 <% else %>
   <table border="1" cellpadding="8">
     <thead>
@@ -32,74 +32,29 @@
         <th>Mã môn</th>
         <th>Tên môn học</th>
         <th>Tín chỉ</th>
-        <% Grade::GRADE_TYPES.each do |type| %>
-          <th><%= type.capitalize %></th>
-        <% end %>
+        <th>Điểm thành phần</th>
         <th>Trung bình</th>
         <th>Xếp loại</th>
         <th>Kết quả</th>
       </tr>
     </thead>
     <tbody>
-      <% @enrollments.each do |enrollment| %>
-        <% course        = enrollment.course %>
-        <% course_grades = @grades_by_course[course.id] || [] %>
-
-        <%# Tính điểm trung bình của môn này %>
-        <% avg = if course_grades.any?
-                   (course_grades.sum(&:score).to_f / course_grades.size).round(1)
-                 end %>
-        <% passed = avg && avg >= Grade::PASSING_SCORE %>
-
-        <tr style="background:<%= passed ? '#f0fff0' : (avg ? '#fff0f0' : 'white') %>">
-          <td><strong><%= course.code %></strong></td>
-          <td><%= link_to course.name, course %></td>
-          <td style="text-align:center"><%= course.credits || "—" %></td>
-
-          <%# Cột điểm theo từng loại %>
-          <% Grade::GRADE_TYPES.each do |type| %>
-            <% g = course_grades.find { |gr| gr.grade_type == type } %>
-            <td style="text-align:center">
-              <% if g %>
-                <span style="color:<%= g.passed? ? 'green' : 'red' %>">
-                  <%= g.score %>
-                </span>
-              <% else %>
-                <span style="color:#ccc;">—</span>
-              <% end %>
-            </td>
-          <% end %>
-
-          <%# Cột trung bình %>
-          <td style="text-align:center">
-            <% if avg %>
-              <strong style="color:<%= passed ? 'green' : 'red' %>">
-                <%= avg %>
-              </strong>
-            <% else %>
-              <span style="color:#ccc;">Chưa có điểm</span>
+      <% @presenter.course_rows.each do |row| %>
+        <tr class="<%= row[:row_class] %>">
+          <td><strong><%= row[:course].code %></strong></td>
+          <td><%= link_to row[:course].name, row[:course] %></td>
+          <td style="text-align:center"><%= row[:course].credits || "—" %></td>
+          <td>
+            <% row[:grades].each do |g| %>
+              <small><%= g.grade_type %>: <strong><%= g.score %></strong></small><br>
             <% end %>
           </td>
-
-          <%# Xếp loại chữ %>
+          <td style="text-align:center"><strong><%= row[:average] %></strong></td>
+          <td style="text-align:center"><strong><%= row[:letter_grade] %></strong></td>
           <td style="text-align:center">
-            <% if avg %>
-              <% dummy_grade = Grade.new(score: avg.to_i) %>
-              <%= dummy_grade.letter_grade %>
-            <% else %>
-              —
-            <% end %>
-          </td>
-
-          <%# Đạt / Không đạt / Chưa rõ %>
-          <td style="text-align:center">
-            <% if avg.nil? %>
-              <em style="color:#999;">Chưa có điểm</em>
-            <% elsif passed %>
-              <span style="color:green; font-weight:bold;">Đạt</span>
-            <% else %>
-              <span style="color:red; font-weight:bold;">Không đạt</span>
-            <% end %>
+            <span class="badge badge-<%= row[:status] == :passed ? 'success' : 'danger' %>">
+              <%= row[:status_label] %>
+            </span>
           </td>
         </tr>
       <% end %>
@@ -109,65 +64,37 @@
   <%# ── Tổng kết ─────────────────────────────────────────────────── %>
   <h3>Tổng kết</h3>
 
-  <% gpa     = @calculator.gpa %>
-  <% gpa_4   = @calculator.gpa_4 %>
-  <% standing = @calculator.academic_standing %>
-
   <table cellpadding="6" border="1">
     <tr>
-      <td>Số môn đã đăng ký:</td>
-      <td><strong><%= @enrollments.count %></strong></td>
-    </tr>
-    <tr>
       <td>Tổng tín chỉ đăng ký:</td>
-      <td><strong><%= @calculator.total_credits %></strong></td>
+      <td><strong><%= @presenter.total_credits %></strong></td>
     </tr>
     <tr>
       <td>Tổng tín chỉ đạt:</td>
-      <td><strong style="color:green"><%= @calculator.earned_credits %></strong></td>
-    </tr>
-    <tr>
-      <td>Điểm TB đơn giản:</td>
-      <td>
-        <% avg = @calculator.overall_average %>
-        <strong><%= @grades_by_course.any? ? avg : "Chưa có điểm" %></strong>
-        <small style="color:#666;">(hệ 100, không trọng số)</small>
-      </td>
+      <td><strong style="color:green"><%= @presenter.earned_credits %></strong></td>
     </tr>
     <tr style="background:#fffbe6;">
       <td><strong>GPA (có trọng số):</strong></td>
       <td>
-        <% if @grades_by_course.any? %>
-          <strong style="font-size:1.2em; color:#2c3e50;"><%= gpa %></strong>
-          <small style="color:#666;">/100</small>
-          &nbsp;|&nbsp;
-          <strong style="color:#2980b9;"><%= gpa_4 %></strong>
-          <small style="color:#666;">/4.0</small>
-        <% else %>
-          <em style="color:#999;">Chưa có điểm</em>
-        <% end %>
+        <strong style="font-size:1.2em; color:#2c3e50;"><%= @presenter.gpa %></strong>
+        <small>/100</small>
+        &nbsp;|&nbsp;
+        <strong style="color:#2980b9;"><%= @presenter.gpa_4 %></strong>
+        <small>/4.0</small>
       </td>
     </tr>
     <tr style="background:#fffbe6;">
       <td><strong>Học lực:</strong></td>
       <td>
-        <% color = case standing
-                   when "Xuất sắc" then "#8e44ad"
-                   when "Giỏi"     then "#27ae60"
-                   when "Khá"      then "#2980b9"
-                   when "Trung bình" then "#f39c12"
-                   when "Yếu"      then "#e67e22"
-                   else                 "#e74c3c"
-                   end %>
-        <strong style="color:<%= color %>; font-size:1.1em;">
-          <%= standing %>
-        </strong>
+        <span class="badge <%= @presenter.standing_badge_class %>">
+          <%= @presenter.standing %>
+        </span>
       </td>
     </tr>
   </table>
 <% end %>
 
 <br>
-<%= link_to "⬅️ Quay lại trang sinh viên", @student %>
+<%= link_to "⬅️ Quay lại trang sinh viên", @presenter.student %>
 |
 <%= link_to "👥 Danh sách sinh viên", students_path %>

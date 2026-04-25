@@ -19,13 +19,9 @@ class StudentsController < ApplicationController
 
   def transcript
     authorize @student, :transcript?
-    @enrollments      = @student.enrollments
-                                .includes(:course)
-                                .order("courses.name")
-    @grades_by_course = @student.grades
-                                .includes(:course)
-                                .group_by(&:course_id)
-    @calculator       = GpaCalculatorService.new(student: @student).call
+    calculator = GpaCalculatorService.new(student: @student).call
+    query      = TranscriptQuery.new(@student)
+    @presenter = StudentTranscriptPresenter.new(@student, calculator, query.grades_by_course)
   end
 
   def new
