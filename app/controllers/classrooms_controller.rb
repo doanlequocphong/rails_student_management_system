@@ -44,19 +44,20 @@ class ClassroomsController < ApplicationController
   def assign_student
     authorize @classroom, :assign_student?
     student = Student.find(params[:student_id])
-    student.update!(classroom: @classroom)
-    redirect_to @classroom, notice: "Đã thêm #{student.name} vào lớp #{@classroom.name}."
-  rescue ActiveRecord::RecordNotFound
-    redirect_to @classroom, alert: "Không tìm thấy sinh viên."
+    service = ClassroomAssignmentService.new(classroom: @classroom, student: student).call.assign!
+
+    redirect_to @classroom,
+      notice: (service.success? ? "Đã thêm #{student.name} vào lớp #{@classroom.name}." : service.error)
   end
 
   def remove_student
     authorize @classroom, :remove_student?
     student = Student.find(params[:student_id])
-    student.update!(classroom: nil)
-    redirect_to @classroom, notice: "Đã xóa #{student.name} khỏi lớp.", status: :see_other
-  rescue ActiveRecord::RecordNotFound
-    redirect_to @classroom, alert: "Không tìm thấy sinh viên."
+    service = ClassroomAssignmentService.new(classroom: @classroom, student: student).call.remove!
+
+    redirect_to @classroom,
+      notice: (service.success? ? "Đã xóa #{student.name} khỏi lớp." : service.error),
+      status: :see_other
   end
 
   def destroy
