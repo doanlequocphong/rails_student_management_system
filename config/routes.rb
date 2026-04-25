@@ -9,8 +9,8 @@ Rails.application.routes.draw do
       # GET /students/:id/transcript — bảng điểm sinh viên
       get :transcript
     end
-    # only: giới hạn chỉ 3 actions — không cần index/show/new/edit riêng
-    resources :enrollments, only: [:create, :update, :destroy]
+    # only: giới hạn chỉ 2 actions — grade management dùng GradesController
+    resources :enrollments, only: [:create, :destroy]
   end
 
   # RESTful routes cho Classrooms + custom member actions
