@@ -109,9 +109,9 @@
   <%# ── Tổng kết ─────────────────────────────────────────────────── %>
   <h3>Tổng kết</h3>
 
-  <% gpa    = @student.gpa %>
-  <% gpa_4  = @student.gpa_4 %>
-  <% standing = @student.academic_standing %>
+  <% gpa     = @calculator.gpa %>
+  <% gpa_4   = @calculator.gpa_4 %>
+  <% standing = @calculator.academic_standing %>
 
   <table cellpadding="6" border="1">
     <tr>
@@ -120,24 +120,24 @@
     </tr>
     <tr>
       <td>Tổng tín chỉ đăng ký:</td>
-      <td><strong><%= @student.total_credits %></strong></td>
+      <td><strong><%= @calculator.total_credits %></strong></td>
     </tr>
     <tr>
       <td>Tổng tín chỉ đạt:</td>
-      <td><strong style="color:green"><%= @student.earned_credits %></strong></td>
+      <td><strong style="color:green"><%= @calculator.earned_credits %></strong></td>
     </tr>
     <tr>
       <td>Điểm TB đơn giản:</td>
       <td>
-        <% avg = @student.overall_average %>
-        <strong><%= avg || "Chưa có điểm" %></strong>
+        <% avg = @calculator.overall_average %>
+        <strong><%= @grades_by_course.any? ? avg : "Chưa có điểm" %></strong>
         <small style="color:#666;">(hệ 100, không trọng số)</small>
       </td>
     </tr>
     <tr style="background:#fffbe6;">
       <td><strong>GPA (có trọng số):</strong></td>
       <td>
-        <% if gpa %>
+        <% if @grades_by_course.any? %>
           <strong style="font-size:1.2em; color:#2c3e50;"><%= gpa %></strong>
           <small style="color:#666;">/100</small>
           &nbsp;|&nbsp;

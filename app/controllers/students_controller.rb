@@ -21,6 +21,7 @@ class StudentsController < ApplicationController
     @grades_by_course = @student.grades
                                 .includes(:course)
                                 .group_by(&:course_id)
+    @calculator       = GpaCalculatorService.new(student: @student).call
   end
 
   def new
