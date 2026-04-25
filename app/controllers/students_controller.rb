@@ -3,7 +3,11 @@ class StudentsController < ApplicationController
 
   def index
     authorize Student
-    @students = policy_scope(Student).includes(:classroom).recent
+    @students = StudentQuery.new(policy_scope(Student))
+                            .search(params[:q])
+                            .with_classroom
+                            .recent
+                            .result
   end
 
   def show
