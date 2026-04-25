@@ -1,5 +1,5 @@
 # Base image: Ruby 3.2 chạy trên Alpine Linux (nhẹ hơn)
-FROM ruby:3.2-alpine
+FROM ruby:3.2.10-alpine
 
 # Cài các package hệ thống cần thiết
 RUN apk add --no-cache \

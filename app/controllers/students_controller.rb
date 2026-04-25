@@ -3,7 +3,7 @@ class StudentsController < ApplicationController
 
   def index
     authorize Student
-    @students = policy_scope(Student).recent
+    @students = policy_scope(Student).includes(:classroom).recent
   end
 
   def show
