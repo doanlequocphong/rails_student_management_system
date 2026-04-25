@@ -23,12 +23,12 @@ RSpec.describe "Api::V1::Students", type: :request do
       it "trả về danh sách sinh viên" do
         get "/api/v1/students", headers: headers
         data = JSON.parse(response.body)
-        expect(data.length).to eq(3)
+        expect(data["students"].length).to eq(3)
       end
 
       it "mỗi student có đúng các fields" do
         get "/api/v1/students", headers: headers
-        student = JSON.parse(response.body).first
+        student = JSON.parse(response.body)["students"].first
         expect(student.keys).to include("id", "name", "email", "phone", "classroom")
       end
 

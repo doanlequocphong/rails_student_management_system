@@ -1,10 +1,11 @@
 module Api
   module V1
     class BaseController < ActionController::API
-      # ActionController::API — nhẹ hơn Base, không có session/cookies/views
-      # Chỉ xử lý JSON responses
+      # ActionController::API không có ActionView theo mặc định.
+      # Hai modules này cho phép render Jbuilder templates (.json.jbuilder).
+      include ActionView::Layouts
+      include ActionController::ImplicitRender
 
-      # Include module xác thực Token của Rails (built-in, không cần gem)
       include ActionController::HttpAuthentication::Token::ControllerMethods
 
       # Xác thực token trước tất cả actions
