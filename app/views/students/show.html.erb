@@ -46,7 +46,6 @@
         <th>Mã môn</th>
         <th>Tên môn</th>
         <th>Ngày đăng ký</th>
-        <th>Điểm</th>
         <th>Thao tác</th>
       </tr>
     </thead>
@@ -56,20 +55,6 @@
           <td><%= enrollment.course.code %></td>
           <td><%= enrollment.course.name %></td>
           <td><%= enrollment.enrolled_at&.strftime("%d/%m/%Y") %></td>
-          <td>
-            <%# Form cập nhật điểm inline %>
-            <%= form_with url: student_enrollment_path(@student, enrollment),
-                          method: :patch,
-                          style: "display:inline" do |form| %>
-              <%= form.number_field :grade,
-                    value: enrollment.grade,
-                    in: 0..10,
-                    step: 0.1,
-                    placeholder: "—",
-                    style: "width:60px" %>
-              <%= form.submit "Lưu", style: "font-size:0.8em" %>
-            <% end %>
-          </td>
           <td>
             <%= link_to "Hủy đăng ký",
                 student_enrollment_path(@student, enrollment),

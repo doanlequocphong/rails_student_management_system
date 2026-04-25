@@ -13,17 +13,6 @@ class EnrollmentsController < ApplicationController
     end
   end
 
-  def update
-    @enrollment = @student.enrollments.find(params[:id])
-    authorize @enrollment
-
-    if @enrollment.update(enrollment_params)
-      redirect_to @student, notice: "Đã cập nhật điểm môn #{@enrollment.course.name}."
-    else
-      redirect_to @student, alert: @enrollment.errors.full_messages.first
-    end
-  end
-
   def destroy
     @enrollment = @student.enrollments.find(params[:id])
     authorize @enrollment
@@ -38,7 +27,4 @@ class EnrollmentsController < ApplicationController
     @student = Student.find(params[:student_id])
   end
 
-  def enrollment_params
-    params.require(:enrollment).permit(:grade)
-  end
 end
